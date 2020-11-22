@@ -14,7 +14,11 @@ var schema = buildSchema(`
     age: Int
     shark: String
   }
+  type Mutation {
+    updateUser(id: Int!, name: String!, age: String): Person
+  }
 `);
+
 // [Person] means return an array of type Person
 // the exclamation in user(id: Int!) means that the id must be provided
 // users query takes an optional shark variable
@@ -69,10 +73,23 @@ var retrieveUsers = function(args) {
   }
 }
 
+// Update a user and return new user details
+var updateUser = function({id, name, age}) {
+  users.map(user => {
+    if (user.id === id) {
+      user.name = name;
+      user.age = age;
+      return user;
+    }
+  });
+  return users.filter(user => user.id === id)[0];
+}
+
 // Root resolver
 var root = {
-  user: getUser,  // Resolver function to return user with specific id
-  users: retrieveUsers
+  user: getUser,
+  users: retrieveUsers,
+  updateUser: updateUser 
 };
 
 // Create an express server and a GraphQL endpoint
